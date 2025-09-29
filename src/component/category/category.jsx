@@ -1,5 +1,5 @@
 import React from 'react';
-import {Link, useParams} from 'react-router-dom';
+    import {Link, useParams} from 'react-router-dom';
 import {useFetchProductCategoriesQuery} from "../../redux/feature/Product/productAPI.js";
 import {ShoppingCart} from "lucide-react";
 import StarRatings from "react-star-ratings/build/star-ratings.js";

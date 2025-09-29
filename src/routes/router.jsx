@@ -48,7 +48,7 @@ const router=createBrowserRouter([
             },
             {
                 path:'/success',
-                element:<PrivateRoute><PaymentsuccessPage/></PrivateRoute>
+                element:<PaymentsuccessPage/>
             },
             {
                 path:'/order/:orderId',
