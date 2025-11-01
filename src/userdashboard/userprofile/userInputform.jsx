@@ -1,8 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import { useGetupdateProfileMutation } from "../../redux/feature/auth/authAPI.js";
-import axios from "axios";
-import { getBaseURL } from "../../utilis/getBaseURL.js";
 import { useSelector } from "react-redux";
 import ButtonLoader from "../../ButtonLoader/buttonLoader.jsx";
 
@@ -16,15 +14,15 @@ const UserInputform = ({ HandleModalclose, isModalOpen }) => {
 
     const [inputForm, setinputForm] = useState({
         Name: "",
-        imageFile: null,
+        profileImage: "",
         Bio: "",
         Profession: "",
     });
 
     const handleOnChange = (e) => {
         const { name, value, files, type } = e.target;
-        if (type === 'file') {
-            setinputForm(prev => ({ ...prev, imageFile: files[0] }));
+        if (type === "file") {
+            setinputForm(prev => ({ ...prev, [name]: files[0] }));
         } else {
             setinputForm(prev => ({ ...prev, [name]: value }));
         }
@@ -35,38 +33,19 @@ const UserInputform = ({ HandleModalclose, isModalOpen }) => {
         setUploading(true);
 
         try {
-            let imageUrl = "";
 
-            if (inputForm.imageFile) {
-                const formData = new FormData();
-                formData.append("image", inputForm.imageFile);
+            const userdata = new FormData();
+            userdata.append("Name", inputForm.Name);
+            userdata.append("bio", inputForm.bio);
+            userdata.append("profession", inputForm.profession);
+            userdata.append("profileImage", inputForm.profileImage);
 
-                const imageUploadResponse = await axios.post(`${getBaseURL()}/api/upload`, formData, {
-                    headers: {
-                        "Content-Type": "multipart/form-data"
-                    }
-                });
-
-                imageUrl = imageUploadResponse.data.url;
-            }
-
-            if (!inputForm.Name || !inputForm.Bio || !inputForm.Profession || !inputForm.imageFile) {
-                alert("Please fill in all required fields.");
-                return;
-            }
-
-            const userdata = {
-                username: inputForm.Name,
-                bio: inputForm.Bio,
-                profession: inputForm.Profession,
-                profileImage: imageUrl,
-            };
 
             await GetupdateProfile({ id: user?._id, userdata }).unwrap();
             alert("Profile updated successfully.");
             setinputForm({
                 Name: "",
-                imageFile: null,
+                profileImage: "",
                 Bio: "",
                 Profession: ""
             });
@@ -104,9 +83,9 @@ const UserInputform = ({ HandleModalclose, isModalOpen }) => {
                         <label className="block text-sm font-medium mb-1">Profile Image</label>
                         <input
                             onChange={handleOnChange}
-                            ref={fileInputRef}
                             type="file"
-                            name="imageFile"
+                            name="profileImage"
+                            accept="image/*"
                             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-200"
                         />
                     </div>

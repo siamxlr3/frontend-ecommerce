@@ -4,8 +4,6 @@ import {
     useUpdateProductMutation,
 } from "../../redux/feature/Product/productAPI.js";
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import { getBaseURL } from "../../utilis/getBaseURL.js";
 import ButtonLoader from "../../ButtonLoader/buttonLoader.jsx";
 
 const Updateproduct = () => {
@@ -17,14 +15,15 @@ const Updateproduct = () => {
     const [inputdata, setinputdata] = useState({
         name: "",
         category: "",
-        color: "",
-        price: "",
-        imageFile: null,
         description: "",
+        price: "",
+        oldPrice: "",
+        color: "",
+        image:""
     });
 
     const productData = data?.data?.Singleproduct || {};
-    const { name, category, color, price, image, description } = productData || {};
+    const { name, category, color, price, image, description,oldPrice } = productData || {};
 
     useEffect(() => {
         if (productData) {
@@ -33,7 +32,8 @@ const Updateproduct = () => {
                 category: category || "",
                 color: color || "",
                 price: price || 0,
-                imageFile: image || null,
+                oldPrice: oldPrice || 0,
+                image: image || null,
                 description: description || "",
             });
         }
@@ -41,8 +41,8 @@ const Updateproduct = () => {
 
     const handleOnChange = (e) => {
         const { name, value, files, type } = e.target;
-        if (type === 'file') {
-            setinputdata(prev => ({ ...prev, imageFile: files[0] }));
+        if (type === "file") {
+            setinputdata(prev => ({ ...prev, [name]: files[0] }));
         } else {
             setinputdata(prev => ({ ...prev, [name]: value }));
         }
@@ -52,29 +52,19 @@ const Updateproduct = () => {
         e.preventDefault();
         setUploading(true);
         try {
-            let imageUrl = "";
+            const newdata = new FormData();
+            newdata.append("name", inputdata.name);
+            newdata.append("category", inputdata.category);
+            newdata.append("description", inputdata.description);
+            newdata.append("price", inputdata.price);
+            newdata.append("oldPrice", inputdata.oldPrice);
+            newdata.append("color", inputdata.color);
 
-            if (inputdata.imageFile) {
-                const formData = new FormData();
-                formData.append("image", inputdata.imageFile);
 
-                const imageUploadResponse = await axios.post(`${getBaseURL()}/api/upload`, formData, {
-                    headers: {
-                        "Content-Type": "multipart/form-data"
-                    }
-                });
-
-                imageUrl = imageUploadResponse.data.url;
+            if (inputdata.image) {
+                newdata.append("image", inputdata.image);
             }
 
-            const newdata = {
-                name: inputdata.name,
-                category: inputdata.category,
-                color: inputdata.color,
-                price: inputdata.price,
-                image: imageUrl,
-                description: inputdata.description,
-            };
 
             await updateProduct({ id, newdata }).unwrap();
             alert("Product successfully updated");
@@ -82,10 +72,11 @@ const Updateproduct = () => {
             setinputdata({
                 name: "",
                 category: "",
-                color: "",
-                price: "",
-                image: null,
                 description: "",
+                price: "",
+                oldPrice: "",
+                color: "",
+                image:""
             });
         } catch (error) {
             console.log(error);
@@ -94,13 +85,6 @@ const Updateproduct = () => {
         }
     };
 
-    // if (isLoading || uploading) {
-    //     return (
-    //         <div className="flex justify-center mt-10">
-    //             <Loading />
-    //         </div>
-    //     );
-    // }
 
     return (
         <div className="bg-white rounded-md p-4 sm:p-6">
@@ -166,11 +150,24 @@ const Updateproduct = () => {
                 </div>
 
                 <div>
+                    <label className="block text-sm font-medium mb-1">OldPrice</label>
+                    <input
+                        value={inputdata.oldPrice}
+                        onChange={handleOnChange}
+                        name="oldPrice"
+                        type="number"
+                        min={0}
+                        className="w-full bg-gray-100 px-4 py-2 rounded-md text-gray-700 outline-none"
+                    />
+                </div>
+
+                <div>
                     <label className="block text-sm font-medium mb-1">Image</label>
                     <input
                         onChange={handleOnChange}
                         type="file"
                         name="image"
+                        accept="image/*"
                         className="w-full bg-gray-100 px-4 py-2 rounded-md text-gray-700 outline-none"
                     />
                 </div>
