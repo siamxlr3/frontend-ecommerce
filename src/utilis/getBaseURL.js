@@ -1,4 +1,4 @@
 export const getBaseURL = () => {
-    return "https://backend-ecommerce-ecru.vercel.app/"
+    return "https://backend-ecommerce-r9km.onrender.com/"
 }
 
